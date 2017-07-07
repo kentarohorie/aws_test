@@ -11,6 +11,41 @@ class ItemsController < ApplicationController
     render text: "SUCCESS"
   end
 
+  def calc
+    binding.pry
+  end
+
+  def stocker
+    if params[:function] == "addstock"
+      amount = params[:amount] ? params[:amount] : 1
+      Item.create(name: params[:name], amount: amount)
+    elsif params[:function] == "checkstock"
+      item = Item.where(name: params[:name]).order("name ASC")
+      if item.empty?
+        render json: Item.all.order("name ASC")
+      else
+        render json: item
+      end
+    elsif params[:function] == "sell"
+      item = Item.find_by_name(params[:name])
+      if params[:amount]
+        amount = params[:amount].to_i
+      else
+        amount = 1
+      end
+      item.amount -= amount
+      item.save
+      if params[:price] && params[:price].to_i > 0
+        item.sells.create(amount: amount, price: params[:price].to_i)
+      end
+    elsif params[:function] == "checksales"
+      sells = Sell.all.map { |s| s.price * s.amount }.inject(:+)
+      render text: "sales: #{ sells }"
+    else
+      render text: "no"
+    end
+  end
+
   # GET /items
   def index
     @items = Item.all
