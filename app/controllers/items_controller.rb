@@ -1,8 +1,14 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: [:show, :update, :destroy]
+  # before_action http_basic_authenticate_with name: "username", password: "passwd123"
+  before_action :basic_auth, only: :secret
 
   def root
     render text: "AMAZON"
+  end
+
+  def secret
+    render text: "SUCCESS"
   end
 
   # GET /items
@@ -51,5 +57,11 @@ class ItemsController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def item_params
       params.fetch(:item, {})
+    end
+
+    def basic_auth
+      authenticate_or_request_with_http_basic do |user,pass|
+        user == "amazon" && pass = "candidate"
+      end
     end
 end
