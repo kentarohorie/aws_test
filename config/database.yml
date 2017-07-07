@@ -50,5 +50,5 @@ test:
 production:
   <<: *default
   database: aws_test_production
-  username: aws_test
-  password: <%= ENV['AWS_TEST_DATABASE_PASSWORD'] %>
+  username: root
+  password:
